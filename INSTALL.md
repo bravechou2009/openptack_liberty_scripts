@@ -1,0 +1,106 @@
+]# Installation Guide
+
+* **Installation must be working in the root account!!**
+
+
+## 1. Script download
+
+```
+cd ~/
+git clone https://github.com/nguyenvanca2110/openptack_liberty_scripts.git
+cd openptack_liberty_scripts
+```
+
+## 2. Configuration files.
+
+### 1). Create ssh-keygen (Very important!!)
+
+```
+ssh-keygen
+All questions enter
+```
+
+### 2). Configuration hosts
+
+```
+cd ~/cloud/liberty
+vi configure.cfg
+AIO_HOST=192.168.10.10 # all-in-one node ip
+#NET_HOST=10.0.2.11 # controller+network node ip(if multi node)
+#COM_HOST=10.0.2.12 # compute node ip(if multi node)
+```
+
+### 3). Configuration Target server passwd
+
+```
+vi chpasswd.sh
+...
+
+
+USER_PASS=ubuntu   # target normal-user passwd
+CHANGED_PASS=1  # changed target normal and root passwd
+...
+
+vi chpasswd_shell.sh
+...
+CURR_PASS=1   # target user before change passwd
+CH_PASS=1       # target user change passwd
+...
+```
+
+### 4). Configuration target information
+
+Below is a case of when the All-in-One.
+
+vi aio-config.cfg
+# 1 NIC : first ext, mgmt, data
+# 2 NIC : first ext | second : mgmt, data
+# 3 NIC : first ext | second : mgmt | third : data
+NET_LIST="eth0" 	#List all card  (if eth0(external), eth1(data))
+#BR_LIST="br-eth0"   #List bridge card, added "br-tracker" when using tracker
+#VLAN_BR_LIST=br-eth0			#Only data bridge for VLAN
+#VLAN_START=1000				# 
+#BR_MAPPING_LIST="br-eth0" 		#Bridge mapping list
+
+BR_MODE="static"				#Set DHCP or static, manual to bridge br-eth0 and br-eth1
+BR_IP_LIST="192.168.10.10/24" 	#IP address of Bridge External
+BR_GW_LIST="192.168.10.2"		#IP address of Bridge External Gateway (for VMware because Default gateway of VM environtment is x.x.x.2/24)
+#BR_GW_LIST="192.168.10.1"		#IP address of Bridge External
+BR_DNS_LIST="8.8.8.8"			#Domain Name System (only External Network)
+
+#MGMT_IP='192.168.10.10'		#IP Addess of Controller Node (Management Network)
+#LOCAL_IP='192.168.10.10' 		# set local IP address for GRE or VxLAN
+CINDER_VOLUME=sdc
+HOSTNAME='controller'			#set node name
+
+# Set password
+DEFAULT_PASS='1'				# set openstack passwd
+
+# Remove Option
+REMOVE_PACKAGE='0'
+
+# Ceilometer Option (0:False, 1:True)
+IS_TELEMETRY='0'
+
+# tacker version(empty is master-not stable, default "-b stable/liberty")
+IS_TACKER='0'
+TACKER_VERSION="-b stable/liberty"
+
+# mellanox
+IS_MLNX='0'
+## lspci -nn | grep Mell
+PCI_VENDOR_DEVS=15b3:1004
+DEVNAME=mlx0
+PHYSICAL_NETWORK=ext_br-sriov
+
+
+
+## 3. Install
+
+```
+./configure.sh
+select "aio" or "net and com" or "mul"
+```
+
+
+## Good Luck!
